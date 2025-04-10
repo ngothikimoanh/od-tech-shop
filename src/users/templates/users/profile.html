@@ -19,7 +19,7 @@ Trang cá nhân
       <h5 class="mb-3"><i class="fa-solid fa-user me-1"></i> Thông tin về tài khoản</h5>
       <div class="row mb-3">
         <div class="col">Điểm tích lũy hiện tại:</div>
-        <div class="col">{{ user.points }}</div>
+        <div class="col" id="user_points">{{ user.points|floatformat:0 }}</div>
       </div>
       <div class="row mb-3">
         <div class="col">Loại tài khoản:</div>

@@ -22,7 +22,7 @@ class CustomPasswordValidator:
             )
 
         if " " in password:
-            raise ValidationError(_("Mật khẩu không được chứa khoảng cách ."), code="password_has_spaces")
+            raise ValidationError(_("Mật khẩu không được chứa khoảng cách."), code="password_has_spaces")
 
     def get_help_text(self):
         return _(
