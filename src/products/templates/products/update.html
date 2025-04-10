@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load get_item %}
+
+{% block title %}
+Cập nhật sản phẩm {{product.name}}
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='manager' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container row mx-auto mt-5">
+  <div class="col-3 pe-5">
+    {% include 'admin_sidebar.html' with path='products' %}
+  </div>
+
+  <div class="col">
+    <form method="post" enctype="multipart/form-data" class="border shadow-sm rounded p-4 bg-body-tertiary">
+      {% csrf_token %}
+
+      <div class="row mb-3">
+        <div class="col">
+          <label class="form-label">Tên sản phẩm</label>
+          <input id="createProductName" class="form-control" name="name" value="{{ form.name.value|default_if_none:'' }}"
+            oninput="updateProductKey(event)" required>
+          {% include 'field_errors.html' with name='name' %}
+        </div>
+        <div class="col">
+          <label class="form-label">Key sản phẩm</label>
+          <input id="createProductKey" class="form-control" name="key" value="{{ form.key.value|default_if_none:'' }}"
+            placeholder="Tự động tạo theo tên" required>
+          {% include 'field_errors.html' with name='key' %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label class="form-label">Giá sản phẩm</label>
+          <div class="input-group">
+            <input type="number" class="form-control" name="price" value="{{ form.price.value|default_if_none:'' }}">
+            <label class="input-group-text">VND</label>
+          </div>
+          {% include 'field_errors.html' with name='price' %}
+        </div>
+        <div class="col d-flex">
+          <div class="me-2">
+            <img class="rounded"
+              src="{% if product.thumbnail_image %}{{ product.thumbnail_image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}"
+              alt="Hình ảnh sản phẩm" width="70" height="70">
+          </div>
+          <div class="flex-grow-1">
+            <label class="form-label">Chọn hình ảnh mới</label>
+            <input type="file" accept="image/*" class="form-control" name="thumbnail_image">
+            {% include 'field_errors.html' with name='thumbnail_image' %}
+          </div>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary me-2">Cập nhật</button>
+        <a href="{% url 'products_list' %}" type="submit" class="btn btn-outline-secondary">Quay lại</a>
+      </div>
+    </form>
+
+    <div class="my-5">
+      <h4>Thuộc tính của sản phẩm</h4>
+
+      <form method="post" action="{% url 'product_attributes' product_id=product.id %}">
+        {% csrf_token %}
+
+        {% for attr_group in attributes %}
+        <div class="accordion mb-3">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#panelsStayOpen-{{ attr_group.id }}" aria-expanded="true"
+                aria-controls="panelsStayOpen-{{ attr_group.id }}">
+                {{ attr_group.name }}
+              </button>
+            </h2>
+            <div id="panelsStayOpen-{{ attr_group.id }}" class="accordion-collapse collapse show">
+              <div class="accordion-body">
+                {% for child in attr_group.attribute_set.all %}
+                <div class="row mb-2">
+                  <div class="col">
+                    {{ child.name }}
+                  </div>
+                  <div class="col">
+                    <textarea class="form-control"
+                      name="attr__{{ child.id }}">{{ product_attributes|get_item:child.id }}</textarea>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-secondary">Cập nhật</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  // Auto generate product key
+  const createProductNameEle = document.getElementById('createProductName')
+  const createProductKeyEle = document.getElementById('createProductKey')
+
+  function generateProductId(name) {
+    return name.replace(/\s+/g, ' ').trim().toLowerCase().replace(/ /g, '-');
+  }
+
+  function updateProductKey(event) {
+    createProductKeyEle.value = generateProductId(event.target.value)
+  }
+</script>
+{% endblock script %}

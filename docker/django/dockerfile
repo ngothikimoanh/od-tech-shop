@@ -1,0 +1,45 @@
+FROM python:3.12-slim
+
+
+# Do not cache when installing Python packages
+# ENV PIP_NO_CACHE_DIR=1
+
+# Disable pip version check
+# ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Increase timeout when installing packages
+# ENV PIP_DEFAULT_TIMEOUT=100
+
+# Disable buffering, log in real-time
+ENV PYTHONUNBUFFERED=1
+
+# Prevent Python from creating .pyc files or __pycache__ directories
+# ENV PYTHONDONTWRITEBYTECODE=1
+
+# Show traceback immediately when a fatal error occurs
+# ENV PYTHONFAULTHANDLER=1
+
+# Suppress DeprecationWarning messages
+# ENV PYTHONWARNINGS="ignore::DeprecationWarning"
+
+# Disable interactive prompts when installing packages with apt-get
+# ENV DEBIAN_FRONTEND=noninteractive
+
+
+# Clear apt cache after installing packages to reduce bloat
+# RUN apt-get update && apt-get install -y \
+#     curl \
+#     && rm -rf /var/lib/apt/lists/*
+
+
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
+
+
+# Install Python packages
+COPY requirements.txt /
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# Use bash instead of sh
+RUN ln -sf /bin/bash /bin/sh

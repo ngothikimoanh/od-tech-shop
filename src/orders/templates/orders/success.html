@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Tạo đơn thành công
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='order' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 border rounded shadow-sm p-5 bg-body-tertiary order-container text-center">
+  <div>
+    <i class="fa-regular fa-circle-check fs-1"></i>
+  </div>
+  <div class="mt-4">
+    Đã tạo đơn hàng thành công! <br>
+    Vui lòng qua quầy kế toán để thanh toán
+  </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+  .order-container {
+    max-width: 500px;
+  }
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+</script>
+{% endblock script %}

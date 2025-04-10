@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load currency_vnd %}
+
+{% block title %}
+OD Tech Shop
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='home' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5">
+	<h4 class="mb-3">Sản phẩm mới</h4>
+	<div class="d-flex justify-content-end mb-3">
+		<select class="form-select me-3" id="sortOption" name="sortOption">
+			<option value="">Sắp xếp </option>
+			<option value="price_asc" {% if sort_option == "price_asc" %}selected{% endif %}>Giá thấp đến cao</option>
+			<option value="price_desc" {% if sort_option == "price_desc" %}selected{% endif %}>Giá cao đến thấp</option>
+			<option value="name_asc" {% if sort_option == "name_asc" %}selected{% endif %}>Tên A - Z</option>
+			<option value="name_desc" {% if sort_option == "name_desc" %}selected{% endif %}>Tên Z - A</option>
+		</select>
+		<button class="btn btn-outline-primary px-5 py-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#filterModal">
+			<i class="fa-solid fa-filter me-1"></i>Lọc
+		</button>
+	</div>
+
+	<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="filterModalLabel">Bộ lọc điện thoại</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label class="form-label">Hãng</label>
+						<div class="d-flex flex-wrap gap-2">
+							<a href="?brand=all"
+								class="btn btn-outline-secondary {% if not selected_brand or selected_brand == 'all' %}active{% endif %}">
+								Tất cả
+							</a>
+							<a href="?brand=Samsung"
+								class="btn btn-outline-secondary {% if selected_brand == 'Samsung' %}active{% endif %}">Samsung</a>
+							<a href="?brand=iPhone"
+								class="btn btn-outline-secondary {% if selected_brand == 'iPhone' %}active{% endif %}">iPhone</a>
+							<a href="?brand=Oppo"
+								class="btn btn-outline-secondary {% if selected_brand == 'Oppo' %}active{% endif %}">Oppo</a>
+							<a href="?brand=Xiaomi"
+								class="btn btn-outline-secondary {% if selected_brand == 'Xiaomi' %}active{% endif %}">Xiaomi</a>
+							<a href="?brand=Hornor"
+								class="btn btn-outline-secondary {% if selected_brand == 'Hornor' %}active{% endif %}">Hornor</a>
+							<a href="?brand=Vivo"
+								class="btn btn-outline-secondary {% if selected_brand == 'Vivo' %}active{% endif %}">Vivo</a>
+							<a href="?brand=Khác"
+								class="btn btn-outline-secondary {% if selected_brand == 'Khác' %}active{% endif %}">Khác</a>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Giá</label>
+						<select class="form-select" id="priceRange" name="price_range">
+							<option value="" {% if not selected_price %}selected{% endif %}>Mặc định</option>
+							<option value="2_4" {% if selected_price == "2_4" %}selected{% endif %}>Từ 2 - 4 triệu
+							</option>
+							<option value="4_7" {% if selected_price == "4_7" %}selected{% endif %}>Từ 4 - 7 triệu
+							</option>
+							<option value="7_13" {% if selected_price == "7_13" %}selected{% endif %}>Từ 7 - 13 triệu
+							</option>
+							<option value="13_20" {% if selected_price == "13_20" %}selected{% endif %}>Từ 13 - 20 triệu
+							</option>
+							<option value="20_up" {% if selected_price == "20_up" %}selected{% endif %}>Trên 20 triệu
+							</option>
+						</select>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Loại điện thoại</label>
+						<div class="d-flex gap-2">
+							<button class="btn btn-outline-primary">Android</button>
+							<button class="btn btn-outline-primary">iPhone (iOS)</button>
+							<button class="btn btn-outline-primary">Điện thoại phổ thông</button>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Nhu cầu</label>
+						<div class="d-flex flex-wrap gap-2">
+							<button class="btn btn-outline-success">Chơi game / Cấu hình cao</button>
+							<button class="btn btn-outline-success">Pin khủng trên 5000 mAh</button>
+							<button class="btn btn-outline-success">Chụp ảnh, quay phim</button>
+							<button class="btn btn-outline-success">Livestream</button>
+							<button class="btn btn-outline-success">Mỏng nhẹ</button>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bỏ chọn</button>
+					<button type="button" class="btn btn-primary" id="applyFilterBtn">Xem kết quả</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="d-flex flex-wrap">
+		{% for product in products %}
+		<div class="d-flex flex-column border rounded p-3 m-3 bg-body-tertiary shadow-sm" style="min-width: 14rem; max-width: 14rem;">
+			<a href="{% url 'product_detail' product_key=product.key %}" class="text-decoration-none">
+				<div class="text-center mb-3">
+					<img
+						src="{% if product.thumbnail_image %}{{ product.thumbnail_image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}"
+						alt="Hình ảnh sản phẩm" style="max-width: 12rem; max-height: 12rem;">
+				</div>
+				<h5 class="text-break text-truncate-2">
+					{{ product.name }}
+				</h5>
+				<p class="text-danger fw-bold mt-auto">
+					{{ product.price|currency_vnd }}
+				</p>
+			</a>
+			<div class="text-center mt-2">
+				<a href="{% url 'guest_order_create' product.id %}" class="btn btn-outline-primary">
+					<i class="fa-solid fa-cart-shopping"></i> Mua ngay
+				</a>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endblock main %}
+{% block script %}
+<script>
+	document.getElementById('sortOption').addEventListener('change', function () {
+		let sortValue = this.value;
+		let url = new URL(window.location.href);
+		url.searchParams.set('sortOption', sortValue);
+		window.location.href = url.toString();
+	});
+
+</script>
+{% endblock script %}

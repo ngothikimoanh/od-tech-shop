@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Đăng nhập
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='auth_login' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-4 px-5 py-4 border bg-body-tertiary rounded shadow-sm load-fade login-container">
+  <div class="text-center mb-5">
+    <img src="{% static 'imgs/logo.jpg' %}" class="w-100 rounded-circle logo">
+  </div>
+
+  <div class="text-center mb-5">
+    <a href="{% url 'auth_login_by_google' %}" class="btn btn-secondary">
+      <i class="fa-brands fa-google me-1"></i> Đăng nhập bằng Google
+    </a>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-floating mb-3">
+      <input type="text" name="phone_number" class="form-control" id="phone_number" placeholder="" value="{{ form.phone_number.value|default_if_none:'' }}">
+      <label for="phone_number">
+        <i class="fa-solid fa-phone me-1"></i> Số điện thoại
+      </label>
+      {% include 'field_errors.html' with name='phone_number' %}
+    </div>
+
+    <div class="form-floating mb-4">
+      <input type="password" name="password" class="form-control" id="password" placeholder=""
+        value="{{ form.password.value|default_if_none:'' }}" >
+      <label for="password">
+        <i class="fa-solid fa-key me-1"></i> Mật khẩu
+      </label>
+      {% include 'field_errors.html' with name='password' %}
+    </div>
+
+    <div class="d-grid mb-5">
+      <button type="submit" class="btn btn-primary" id="login_submit_btn">Đăng nhập</button>
+    </div>
+
+    <hr>
+
+    <div class="text-end">
+      Bạn không có tài khoản? <a href="{% url 'auth_register' %}">Đăng ký tại đây</a>
+    </div>
+
+  </form>
+</div>
+{% endblock main %}
+
+{% block style %}
+<style>
+  .login-container {
+    max-width: 450px;
+  }
+
+  .logo {
+    max-width: 200px;
+  }
+</style>
+{% endblock style %}

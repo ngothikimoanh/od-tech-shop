@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Danh sách sản phẩm
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='manager' %}
+{% endblock navigation %}
+
+{% block main %}
+
+<div class="container row mx-auto mt-5">
+  <div class="col-3 pe-5">
+    {% include 'admin_sidebar.html' with path='products' %}
+  </div>
+
+  <div class="col-9">
+    <form method="post" enctype="multipart/form-data" class="border shadow-sm rounded p-4 bg-body-tertiary">
+      {% csrf_token %}
+
+      <div class="row mb-3">
+        <div class="col">
+          <label class="form-label">Tên sản phẩm</label>
+          <input id="createProductName" class="form-control" name="name"
+            value="{{ form.name.value|default_if_none:'' }}" oninput="updateProductKey(event)" required>
+          {% include 'field_errors.html' with name='name' %}
+        </div>
+        <div class="col">
+          <label class="form-label">Key sản phẩm</label>
+          <input id="createProductKey" class="form-control" name="key" value="{{ form.key.value|default_if_none:'' }}"
+            placeholder="Tự động tạo theo tên" required>
+          {% include 'field_errors.html' with name='key' %}
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col">
+          <label class="form-label">Giá sản phẩm</label>
+          <div class="input-group">
+            <input type="number" class="form-control" name="price" value="{{ form.price.value|default_if_none:'' }}"
+              required>
+            <label class="input-group-text">VND</label>
+          </div>
+          {% include 'field_errors.html' with name='price' %}
+        </div>
+        <div class="col">
+          <label class="form-label">Hình ảnh</label>
+          <input type="file" accept="image/*" class="form-control" name="thumbnail_image">
+          {% include 'field_errors.html' with name='thumbnail_image' %}
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" class="btn btn-primary">Tạo sản phẩm</button>
+      </div>
+    </form>
+
+    <div class="mt-5 table-responsive">
+      <h4 class="mb-4">Danh sách sản phẩm</h4>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Hình ảnh</th>
+            <th scope="col">Key</th>
+            <th scope="col">Tên</th>
+            <th scope="col">Giá</th>
+            <th scope="col" class="text-center">Thiết bị</th>
+            <th scope="col" class="text-center">Chỉnh sửa</th>
+            <th scope="col" class="text-center">Xóa</th>
+          </tr>
+        </thead>
+
+        <tbody class="load-fade">
+          {% for product in products %}
+          <tr>
+            <td>
+              <img class="rounded"
+                src="{% if product.thumbnail_image %}{{ product.thumbnail_image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}"
+                alt="Hình ảnh sản phẩm" width="50" height="50">
+            </td>
+            <td>{{ product.key }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price|currency_vnd }}</td>
+            <td class="text-center">
+              <a href="{% url 'product_devices' product_id=product.id %}" class="btn btn-outline-success px-3 py-2">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+              </a>
+            </td>
+            <td class="text-center">
+              <a class="btn btn-outline-secondary px-3 py-2" href="{% url 'products_update' product_id=product.id %}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </a>
+            </td>
+            <td class="text-center">
+              <button class="btn btn-outline-danger px-3 py-2" data-bs-toggle="modal"
+                data-bs-target="#deleteProductModal"
+                onclick="deleteConfirmProduct('{{ product.id }}', '{{ product.name }}')">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Bạn có chắc muốn xóa sản phẩm</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Tên sản phẩm <strong><span id="deleteProductConfirmName"></span></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <form method="post" id="deleteProductConfirmForm">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Chắc chắn xóa <i class="fa-solid fa-trash ms-1"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  // Auto generate product key
+  const createProductNameEle = document.getElementById('createProductName')
+  const createProductKeyEle = document.getElementById('createProductKey')
+
+  function generateProductId(name) {
+    return name.replace(/\s+/g, ' ').trim().toLowerCase().replace(/ /g, '-');
+  }
+
+  function updateProductKey(event) {
+    createProductKeyEle.value = generateProductId(event.target.value)
+  }
+
+  // Confirm delete
+  function deleteConfirmProduct(id, name) {
+    document.getElementById('deleteProductConfirmName').innerText = name
+    document.getElementById('deleteProductConfirmForm').action = `/products/${id}/delete`
+  }
+</script>
+{% endblock script %}

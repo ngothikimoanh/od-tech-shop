@@ -1,0 +1,54 @@
+{% load phone_number_mark %}
+{% load static %}
+
+<div class="container py-2 d-flex justify-content-between align-items-center">
+  <div>
+    <a href="{% url 'home' %}"
+      class="text-decoration-none fs-4 fw-medium text-body d-flex align-items-center {% if path == 'home' %}active{% endif %}">
+      <img src="{% static 'imgs/brand.jpg' %}" class="rounded-circle me-2 brand">
+      OD Tech
+    </a>
+  </div>
+
+  <form action="{% url 'home' %}" class="web-lg w-100 search-form">
+    <input name="search" class="form-control text-center m-auto rounded-pill search-input" value="{{search}}"
+      placeholder=" 🔎 Bạn muốn tìm gì...">
+    <button type="submit" class="d-none"></button>
+  </form>
+
+  <div>
+    {% if request.user.is_authenticated %}
+
+    {% if request.user.role == 'admin' %}
+    <a href="{% url 'users_list' %}"
+      class="btn btn-outline-secondary py-2 me-3 {% if path == 'manager' %}active{% endif %}">
+      <i class="fa-solid fa-wrench me-1"></i> Quản trị
+    </a>
+    {% endif %}
+
+    {% if request.user.role == 'employee' %}
+    <a href="{% url 'order_create' %}"
+      class="btn btn-outline-secondary py-2 me-3 {% if path == 'order' %}active{% endif %}">
+      <i class="fa-solid fa-file-pen me-1"></i> Tạo đơn
+    </a>
+    {% endif %}
+
+    <a href="{% url 'user_profile' %}" class="btn btn-outline-primary py-2 {% if path == 'profile' %}active{% endif %}">
+      <i class="fa-solid fa-user me-1"></i> {{ request.user.phone_number|phone_number_mark }}
+    </a>
+    {% else %}
+    <a href="{% url 'auth_login' %}"
+      class="btn btn-outline-primary py-2 {% if path == 'auth_login' or path == 'auth_register' %}active{% endif %}">
+      <i class="fa-regular fa-user me-1"></i> Đăng nhập
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container d-flex justify-content-center align-items-center web-sm mb-2 d-none">
+  <form action="{% url 'home' %}" class="w-100">
+    <input name="search" class="form-control text-center rounded-pill search-input" value="{{search}}"
+      placeholder=" 🔎 Bạn muốn tìm gì...">
+    <button type="submit" class="d-none"></button>
+  </form>
+</div>

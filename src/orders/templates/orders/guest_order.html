@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load currency_vnd %}
+
+{% block title %}
+Đặt hàng
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='home' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 guest-order-container">
+  <div class="py-5 px-5 border rounded bg-body-tertiary shadow-sm load-fade">
+    <div class="alert alert-info mb-4" role="alert">
+      <div class="d-flex">
+        <div class="me-auto fw-semibold">Số điện thoại</div>
+        <div>{{ user.phone_number }}</div>
+      </div>
+      <div class="d-flex">
+        <div class="me-auto fw-semibold">Họ và tên</div>
+        <div>{{ user.get_full_name }}</div>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="address" class="form-label">Địa chỉ nhận hàng</label>
+        <input type="text" class="form-control" id="address" name="address" required>
+      </div>
+
+      <div class="d-flex mb-4">
+        <div class="me-3">
+          <img src="{{ product.thumbnail_image.url }}" alt="Hình ảnh sản phẩm" style="width: 8rem; height: 8rem;"
+            class="rounded">
+        </div>
+        <div class="flex-grow-1 d-flex flex-column  justify-content-around">
+          <h5> {{ product.name }}</h5>
+          <h4 class="text-end">
+            {{ product.price|currency_vnd }}
+          </h4>
+        </div>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="use_points" name="use_points" value="1">
+        <label class="form-check-label" for="use_points">
+          Sử dụng tích điểm: {{ user.points }}
+        </label>
+      </div>
+      <hr>
+      <div class="flex-grow-1 d-flex flex-column  justify-content-around">
+        <h4 class="text-end"> Tổng giá trị:  <span id="orderPrice"></span>
+        </h4>
+      </div>
+      <hr>
+      <div class="mt-4 d-grid">
+        <button type="submit" class="btn btn-primary">Đặt hàng!</button>
+      </div>
+    </form>
+
+
+  </div>
+</div>
+{% endblock main %}
+
+{% block style %}
+<style>
+  .guest-order-container {
+    max-width: 40rem;
+  }
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  const orderPriceEl = document.querySelector('#orderPrice')
+  const use_points = document.querySelector('#use_points')
+
+  const productPrice = Number('{{product.price}}')
+  const userPoint = Number('{{user.points}}'.replace(',', '.'))
+
+  function currencyVND(value) {
+    try {
+      let number = parseFloat(value);
+      if (isNaN(number)) throw new Error();
+
+      return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+    } catch (error) {
+      return "0₫";
+    }
+  }
+
+  const updatePrice = () => {
+    let price = use_points.checked ? productPrice - userPoint : productPrice
+    price = currencyVND(price)
+    orderPriceEl.textContent = price
+  }
+
+  use_points.addEventListener('change', updatePrice)
+
+  updatePrice()
+</script>
+{% endblock script %}

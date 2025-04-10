@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Danh sách người dùng
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='manager' %}
+{% endblock navigation %}
+
+{% block main %}
+
+<div class="container row mx-auto mt-5">
+  <div class="col-3 pe-5">
+    {% include 'admin_sidebar.html' with path='users' %}
+  </div>
+
+  <div class="col">
+    <div class="mt-5 table-responsive">
+      <div class="d-flex align-items-center mb-4">
+        <h4>Danh sách người dùng</h4>
+        <form class="ms-auto">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Tìm kiếm" name="search-user" value="{{ search_user }}"
+              autofocus>
+            <button class="btn btn-success" type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Số điện thoại</th>
+            <th scope="col">Email</th>
+            <th scope="col">Họ</th>
+            <th scope="col">Tên</th>
+            <th scope="col">Vai trò</th>
+            <th scope="col" class="text-center">Đang hoạt động</th>
+          </tr>
+        </thead>
+
+        <tbody class="load-fade">
+          {% for user in users %}
+          <tr>
+            <td>{{ user.phone_number }}</td>
+            <td>{{ user.email|default_if_none:'-' }}</td>
+            <td>{{ user.last_name|default_if_none:'-' }}</td>
+            <td>{{ user.first_name|default_if_none:'-' }}</td>
+            <td>
+              {% if user.role != 'admin' and user.is_active %}
+              <a href="#" data-bs-toggle="modal" data-bs-target="#changeRoleModal"
+                onclick="changeUserRole(userId='{{ user.id }}', currentRole='{{ user.role }}')">
+                <i class="fa-solid fa-user-gear me-1"></i>
+                {% endif %}
+                {{ user.get_role_display }}
+                {% if user.role != 'admin' and user.is_active %}
+              </a>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if user.is_active %}
+              <i class="fa-solid fa-circle-check"></i>
+              {% else %}
+              <i class="fa-regular fa-circle-check"></i>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Change Role Modal -->
+<div class="modal fade" id="changeRoleModal" tabindex="-1" aria-labelledby="changeRoleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="changeRoleModalLabel">Đổi quyền</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'change_user_role' %}">
+        <div class="modal-body my-3">
+          <label class="form-label">Chọn vai trò mới</label>
+          <select class="form-select" name="new_role">
+            {% for role, display in role_display.items %}
+            <option value="{{ role }}" id="{{ role }}RoleOption">{{ display }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          {% csrf_token %}
+          <input type="hidden" id="changeRoleOfUserId" name="user_id">
+          <input type="hidden" name="lastUrl" value="{{ request.build_absolute_uri }}">
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+{% endblock style %}
+
+{% block script %}
+<script>
+  const changeRoleOfUserIdEle = document.querySelector('#changeRoleOfUserId')
+  const ROLES = {
+    {% for role in role_display %}
+    {{ role }}: document.querySelector('#{{ role }}RoleOption'),
+    {% endfor %}
+  }
+
+  function changeUserRole(userId, currentRole) {
+    changeRoleOfUserIdEle.value = userId
+
+    for (role in ROLES) {
+      ROLES[role].selected = (role === currentRole) ? true : false
+    }
+  }
+</script>
+{% endblock script %}

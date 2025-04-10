@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load currency_vnd %}
+
+{% block title %}
+Danh sách đơn hàng
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='manager' %}
+{% endblock navigation %}
+
+{% block main %}
+
+<div class="container row mx-auto mt-5">
+  <div class="col-3 pe-5">
+    {% include 'admin_sidebar.html' with path='orders' %}
+  </div>
+  <div class="col">
+    <form class="mb-4">
+      <select class="form-select" name="status" id="statusSelect" onchange="this.form.submit()">
+        <option value="pendding">Chờ xác nhận</option>
+        <option value="verified">Đã xác nhận</option>
+        <option value="shipping">Đang Giao</option>
+        <option value="canceled">Đã hủy</option>
+        <option value="success">Hoàn thành</option>
+      </select>
+    </form>
+
+    <div>
+      {% for order in orders %}
+      <div class="border mb-3 shadow-sm p-3 rounded bg-body-tertiary">
+        <div class="d-flex mb-3">
+          <div class="me-auto">
+            <strong>Đơn hàng: </strong>#{{ order.id }}
+          </div>
+          <div class="d-flex">
+            {% if order.is_paid %}
+            <div class="me-2">
+              <span class="badge text-bg-primary">
+                <i class="fa-solid fa-check me-1"></i> Đã Thanh toán
+              </span>
+            </div>
+            {% endif %}
+
+            <div class="me-2">
+              {% if order.is_receive_in_store %}
+              <span class="badge text-bg-info"><i class="fa-solid fa-store me-1"></i> Cửa hàng</span>
+              {% else %}
+              <span class="badge text-bg-info"><i class="fa-solid fa-earth-americas me-1"></i> Giao hàng</span>
+              {% endif %}
+            </div>
+
+            <div class="order_status me-2">
+              <span class="badge text-bg-secondary">
+                <i class="fa-solid fa-money-bill me-1"></i> {{ order.payment_method }}
+              </span>
+            </div>
+
+            <div class="order_status">
+              <span class="badge text-bg-success">{{ order.status_display }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex">
+          <div class="me-3">
+            <div>
+              <img class="rounded"
+                src="{% if order.product.thumbnail_image %}{{ order.product.thumbnail_image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}"
+                alt="Hình ảnh sản phẩm" width="120" height="120">
+            </div>
+          </div>
+
+          <div class="me-auto">
+            <div>
+              <h4>{{ order.product.name }}</h4>
+            </div>
+
+            <div class="mb-2"><strong>Mã thiết bị:</strong> <code>{{ order.device_id }}</code></div>
+            <div>
+              <strong>Nhân viên bán hàng:</strong>
+              {% if order.saler %}
+              [{{ order.saler.get_full_name }}]
+              {% else %}
+              [Tự đặt hàng]
+              {% endif %}
+            </div>
+            <div class="mb-2">
+              <strong>Khách hàng:</strong> {{ order.buyer_phone_number }}
+              {% if order.buyer %}
+              [{{ order.buyer.get_full_name }}]
+              {% else %}
+              [Khách vãng lai]
+              {% endif %}
+            </div>
+
+            {% if order.address %}
+            <div>
+              <strong>Địa chỉ giao hàng: </strong> {{ order.address }}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="align-self-end ms-3">
+            <div>Tổng đơn hàng:</div>
+            <h3>{{ order.price|currency_vnd }}</h3>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-end">
+          {% if order.status == 'pendding' and order.status != 'verified' %}
+          <form class="me-2" method="post" action="{% url 'order_verified_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="verified" class="btn btn-primary">Xác nhận đơn hàng hợp lệ</button>
+          </form>
+          {% endif %}
+
+          {% if order.status == 'verified' and order.is_paid == False %}
+          <form class="me-2" method="post" action="{% url 'order_paided_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="verified" class="btn btn-primary">Xác nhận thanh toán</button>
+          </form>
+          {% endif %}
+
+          {% if not order.is_receive_in_store and order.is_paid and order.status == 'verified' and order.status != 'shipping' %}
+          <form class="me-2" method="post" action="{% url 'order_shipping_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="shipping" class="btn btn-primary">Giao cho đơn vị vận chuyển</button>
+          </form>
+          {% endif %}
+
+          {% if order.is_receive_in_store and order.status == 'verified' and order.is_paid and order.status != 'success' %}
+          <form class="me-2" method="post" action="{% url 'order_success_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="success" class="btn btn-primary">Hoàn thành đơn hàng</button>
+          </form>
+          {% elif not order.is_receive_in_store and order.status == 'shipping' and order.is_paid and order.status != 'success' %}
+          <form class="me-2" method="post" action="{% url 'order_success_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="success" class="btn btn-primary">Hoàn thành đơn hàng</button>
+          </form>
+          {% endif %}
+
+          {% if order.status != 'success' and order.status != 'canceled' %}
+          <form class="me-2" method="post" action="{% url 'order_cancel_status' order_id=order.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="last_url" value="{{ request.get_full_path }}">
+            <button type="submit" value="canceled" class="btn btn-outline-danger">Hủy đơn hàng</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock main %}
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+{% endblock style %}
+
+{% block script %}
+<script>
+  // Lấy tham số "status" từ URL
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get("status");
+
+  // Nếu có giá trị status, đặt giá trị cho select
+  if (status) {
+    document.getElementById("statusSelect").value = status;
+  }
+</script>
+{% endblock script %}

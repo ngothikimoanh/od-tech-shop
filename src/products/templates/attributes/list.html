@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Danh sách sản phẩm
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='manager' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container row mx-auto mt-5">
+  <div class="col-3 pe-5">
+    {% include 'admin_sidebar.html' with path='attributes' %}
+  </div>
+
+  <div class="col-9">
+    <div class="attribute-container mx-auto ">
+      <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Tên group" name="name">
+          <button class="btn btn-outline-primary" type="submit">Thêm</button>
+        </div>
+      </form>
+
+      <hr class="my-4">
+      {% for attribute_group in attribute_groups %}
+      <div class="accordion mb-4 shadow-sm" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex">
+            <button class="accordion-button bg-pr imary-subtle text-primary-emphasis collapsed p-2 flex-grow-1" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseOne-{{attribute_group.id}}" aria-expanded="true"
+              aria-controls="collapseOne-{{attribute_group.id}}">
+              {{ attribute_group.name }}
+            </button>
+            <button class="btn btn-outline-danger btn-sm px-2 py-1 p-2" data-bs-toggle="modal"
+              data-bs-target="#deleteAttributeModal"
+              onclick="deleteConfirmAttribute('{{ attribute_group.name|escapejs }}', `{% url 'attribute_group_delete' attribute_group_id=attribute_group.id %}`)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </h2>
+          <div id="collapseOne-{{attribute_group.id}}" class="accordion-collapse collapse"
+            data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <form method="post" action="{% url 'attribute_create' %}" class="mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="group" value="{{ attribute_group.id }}">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Tên thuộc tính" name="name">
+                  <button class="btn btn-outline-secondary" type="submit">Thêm</button>
+                </div>
+              </form>
+
+              <div class="list-group">
+                {% for attribute in attribute_group.attribute_set.all %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <span class="text-break">{{ attribute.name }}</span>
+                  <button class="btn btn-outline-danger btn-sm px-2 py-1" data-bs-toggle="modal"
+                    data-bs-target="#deleteAttributeModal"
+                    onclick="deleteConfirmAttribute('{{ attribute.name|escapejs }}', `{% url 'attribute_delete' attribute_id=attribute.id %}`)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="deleteAttributeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Bạn có chắc muốn xóa</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-break">
+        <p><strong><span id="deleteAttributeConfirmName"></span></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <form method="post" id="deleteAttributeConfirmForm">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Chắc chắn xóa <i class="fa-solid fa-trash ms-1"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+  .attribute-container {
+    max-width: 500px;
+  }
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  // Confirm delete
+  function deleteConfirmAttribute(name, action_form) {
+    console.log(name)
+    console.log(action_form)
+
+    document.getElementById('deleteAttributeConfirmName').innerText = name
+    document.getElementById('deleteAttributeConfirmForm').action = action_form
+  }
+
+</script>
+{% endblock script %}

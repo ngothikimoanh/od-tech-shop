@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+Không tìm thấy sản phẩm
+{% endblock title %}
+
+{% block navigation %}
+{% include "navigation.html" with path='home' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container text-center mt-5">
+  <h3>Không tìm thấy sản phẩm</h3>
+  <p>Không có kết quả nào cho từ khóa <strong>"{{ search }}"</strong>.</p>
+  <a href="{% url 'home' %}" class="btn btn-primary">Quay lại trang chủ</a>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+</script>
+{% endblock script %}
