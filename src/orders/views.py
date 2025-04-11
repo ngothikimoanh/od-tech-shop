@@ -212,7 +212,6 @@ def order_success_status_view(request: HttpRequest, order_id: int):
 @require_login
 def guest_order_create_view(request: HttpRequest, product_id: int):
     product = get_object_or_404(Product, id=product_id)
-
     device = Device.objects.filter(product=product, status=DeviceStatus.AVAILABLE.value).first()
 
     if not device:
@@ -221,7 +220,6 @@ def guest_order_create_view(request: HttpRequest, product_id: int):
 
     if request.method == HTTPMethod.POST:
         address = request.POST.get("address")
-
         if not address:
             messages.error(request, "Vui lòng nhập địa chỉ giao hàng!")
             return redirect("guest_order_create", product_id=product_id)
@@ -239,7 +237,7 @@ def guest_order_create_view(request: HttpRequest, product_id: int):
             request.user.save()
 
         order = Order.objects.create(
-            buyer_phone_number=request.user.phone_number,  # type:ignore
+            buyer_phone_number=request.user.phone_number,
             device=device,
             product_price=product_price,
             price=price,
@@ -252,7 +250,7 @@ def guest_order_create_view(request: HttpRequest, product_id: int):
         device.save()
 
         messages.success(request, "Đặt hàng thành công")
-        return redirect(f"{reverse('viet_qr_code')}?order_id={order.id}&amount={order.price}")  # type: ignore
+        return redirect(f"{reverse('viet_qr_code')}?order_id={order.id}&amount={order.price}")
 
     context = {
         "product": product,

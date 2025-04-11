@@ -93,18 +93,8 @@ def auth_order_view(request: HttpRequest):
         {
             "id": order.id,  # type:ignore
             "created_at": order.created_at,
-            "buyer_phone_number": order.buyer_phone_number,
-            "buyer": User.objects.filter(phone_number=order.buyer_phone_number).first(),
-            "saler": order.saler,
-            "device": order.device,
-            "product": order.device.product,
             "price": order.price,
-            "payment_method": PAYMENT_METHODS_DISPLAY.get(order.payment_method, "Không rõ"),
             "status_display": ORDER_STATUS_DISPLAY.get(order.status, "Không rõ"),
-            "status": order.status,
-            "address": order.address,
-            "is_receive_in_store": order.is_receive_in_store,
-            "is_paid": order.is_paid,
         }
         for order in orders
     ]

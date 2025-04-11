@@ -16,12 +16,6 @@
     <img src="{% static 'imgs/logo.jpg' %}" class="w-100 rounded-circle logo">
   </div>
 
-  <div class="text-center mb-5">
-    <a href="{% url 'auth_login_by_google' %}" class="btn btn-secondary">
-      <i class="fa-brands fa-google me-1"></i> Đăng nhập bằng Google
-    </a>
-  </div>
-
   <form method="post">
     {% csrf_token %}
 

@@ -1,10 +1,9 @@
+from products.models import Product
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.shortcuts import redirect, render
 
 User = get_user_model()
-
-from products.models import Product
 
 
 def home_view(request):
@@ -36,10 +35,9 @@ def home_view(request):
         "H": 'Hornor',
     }
 
-    # Gán brand dựa vào chữ cái đầu tiên của tên sản phẩm
     for product in products:
-        first_letter = product.name[0].upper()  # Lấy chữ cái đầu tiên và chuyển thành chữ in hoa
-        product.brand = brand_mapping.get(first_letter, 'Khác')  # Mặc định là 'Khác' nếu không khớp
+        first_letter = product.name[0].upper()
+        product.brand = brand_mapping.get(first_letter, 'Khác')
 
     selected_brand = request.GET.get('brand', '').strip()
     if selected_brand and selected_brand != "all":

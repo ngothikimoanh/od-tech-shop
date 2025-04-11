@@ -46,39 +46,3 @@ def register_view(request: HttpRequest):
     }
 
     return render(request, "authentication/register.html", context)
-
-
-@require_not_login
-def login_with_google_view(request: HttpRequest):
-    authorization_url, _ = settings.GOOGLE_FLOW.authorization_url(
-        access_type="offline",
-        include_granted_scopes="true",
-    )
-    return redirect(authorization_url)
-
-
-@require_not_login
-def google_callback_view(request: HttpRequest):
-    try:
-        code = request.GET.get("code")
-        settings.GOOGLE_FLOW.fetch_token(code=code)
-
-        credentials = settings.GOOGLE_FLOW.credentials
-
-        google_request = Request()
-
-        id_token = credentials.id_token
-        id_info = verify_oauth2_token(id_token, google_request)
-
-        email = id_info["email"]
-        user = User.objects.filter(email=email).first()
-
-        if user:
-            login(request=request, user=user)
-            return render(request, "redirect_to.html")
-
-        messages.error(request, "Tài khoản Google này chưa được đăng ký.")
-    except Exception as exc:
-        print("An error occurred while logging in with Google: ", exc)
-        messages.error(request, "Có lỗi xảy ra khi đăng nhập bằng Google, vui lòng thử lại sau.")
-    return redirect("auth_login")
