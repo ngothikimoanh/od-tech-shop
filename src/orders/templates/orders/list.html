@@ -172,11 +172,9 @@ Danh sách đơn hàng
 
 {% block script %}
 <script>
-  // Lấy tham số "status" từ URL
   const params = new URLSearchParams(window.location.search);
   const status = params.get("status");
 
-  // Nếu có giá trị status, đặt giá trị cho select
   if (status) {
     document.getElementById("statusSelect").value = status;
   }
