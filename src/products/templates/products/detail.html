@@ -68,10 +68,16 @@ Chi tiết sản phẩm
             <i class="fa-solid fa-triangle-exclamation"></i> Sản phẩm đã hết hàng
           </h5>
           {% else %}
-          <a href="{% url 'guest_order_create' product.id %}" class="btn btn-primary">
-            Mua ngay
-          </a>
-        </div>
+          <div class="p-4 bg-white rounded shadow-sm">
+            <div class="d-flex flex-column gap-3">
+              <a href="{% url 'guest_order_create' product.id %}" class="btn btn-primary fw-bold py-3 fs-5 w-100 rounded-3">
+                MUA NGAY
+              </a>
+              <a href="#" class="btn btn-outline-danger w-100 rounded-3 py-2">
+                <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ
+              </a>
+            </div>
+          </div>
         {% endif %}
         <div class="text-body">
           <i class="fa-solid fa-phone-volume"></i>
