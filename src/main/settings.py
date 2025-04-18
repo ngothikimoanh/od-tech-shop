@@ -14,17 +14,17 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from google_auth_oauthlib.flow import Flow
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables
 
+# Load environment variables
 DEFAULT_ENV_FILE = BASE_DIR / "../.env"
 
 if not load_dotenv(DEFAULT_ENV_FILE):
     raise FileNotFoundError(".env file not found in either root or docker directory.")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -47,12 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Custom apps
-    "common",
-    "authentication",
-    "products",
-    "users",
-    "orders",
+    "web",
 ]
 
 MIDDLEWARE = [
@@ -116,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {
-        "NAME": "authentication.validators.CustomPasswordValidator",
+        "NAME": "web.validators.user.CustomPasswordValidator",
     },
 ]
 
@@ -155,38 +150,7 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 
 
 # Custom User Model
-AUTH_USER_MODEL = "users.User"
-
-
-# Login redirect
-LOGIN_REDIRECT_URL = "home"
-LOGIN_URL = "auth_login"
-
-
-# Login with Google
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-
-DJANGO_HOST = os.getenv("DJANGO_HOST")
-DJANGO_PORT = os.getenv("DJANGO_PORT")
-REDIRECT_URI = f"http://{DJANGO_HOST}:{DJANGO_PORT}/auth/google_callback"
-
-GOOGLE_FLOW = Flow.from_client_config(
-    client_config={
-        "web": {
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "redirect_uris": [REDIRECT_URI],
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-        }
-    },
-    scopes=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.email",
-    ],
-    redirect_uri=REDIRECT_URI,
-)
+AUTH_USER_MODEL = "web.User"
 
 
 # Config save static media

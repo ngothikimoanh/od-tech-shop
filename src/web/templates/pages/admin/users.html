@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Quản lý người dùng
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" with path='admin' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5">
+  <div class="d-flex">
+    <h4>Danh sách người dùng</h4>
+    <form class="ms-auto">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Tìm kiếm" name="search_user" id="searchUser" autofocus>
+        <button class="btn btn-success" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-5 table-responsive border rounded p-4 bg-body-tertiary">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Số điện thoại</th>
+          <th scope="col">Email</th>
+          <th scope="col">Tên</th>
+          <th scope="col">Giới tính</th>
+          <th scope="col">Ngày sinh</th>
+          <th scope="col">Địa chỉ</th>
+          <th scope="col">Điểm tích lũy</th>
+          <th scope="col">Trạng thái</th>
+        </tr>
+      </thead>
+
+      <tbody class="load-fade">
+        {% for user in users %}
+        <tr>
+          <td>{{ user.phone_number }}</td>
+          <td class="text-break" style="max-width: 10rem;">{{ user.email|default_if_none:'-' }}</td>
+          <td class="text-break" style="max-width: 10rem;">{{ user.name|default_if_none:'-' }}</td>
+          <td>{% if user.gender == 'Nam' %}<i class="fa-solid fa-mars"></i>{% elif user.gender == 'Nữ' %}<i class="fa-solid fa-venus"></i>{% else %}<i class="fa-solid fa-genderless"></i>{% endif %}</td>
+          <td>{{ user.birthday|date:"d-m-Y"|default_if_none:'-' }}</td>
+          <td class="text-break" style="max-width: 10rem;">{{ user.address|default_if_none:'-' }}</td>
+          <td>{{ user.points }}</td>
+          <td>{% if user.is_active %}<i class="fa-solid fa-circle-check"></i>{% else %}<i class="fa-solid fa-xmark"></i>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+{% endblock main %}
+
+{% block script %}
+<script>
+  const searchUser = new URLSearchParams(window.location.search).get("search_user")
+  document.querySelector('#searchUser').value = searchUser
+</script>
+{% endblock script %}

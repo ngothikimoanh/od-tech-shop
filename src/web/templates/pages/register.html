@@ -1,0 +1,75 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Đăng ký
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" with path='login' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 px-5 py-4 border bg-body-tertiary rounded shadow-sm load-fade register-container">
+  <div class="text-center mb-5">
+    <img src="{% static 'imgs/logo.jpg' %}" class="w-100 rounded-circle logo">
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-floating mb-3">
+      <input type="text" name="phone_number" class="form-control" id="phone_number" placeholder=""
+        value="{{ form.phone_number.value|default_if_none:'' }}" autofocus>
+      <label for="phone_number">
+        <i class="fa-solid fa-phone me-1"></i>
+        Số điện thoại
+      </label>
+      {% include 'components/field_errors.html' with name='phone_number' %}
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="password" name="password" class="form-control" id="password" placeholder=""
+        value="{{ form.password.value|default_if_none:'' }}">
+      <label for="password">
+        <i class="fa-solid fa-key me-1"></i>
+        Mật khẩu
+      </label>
+      {% include 'components/field_errors.html' with name='password' %}
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="password" name="password_confirm" class="form-control" id="password_confirm" placeholder=""
+        value="{{ form.password_confirm.value|default_if_none:'' }}">
+      <label for="password_confirm">
+        <i class="fa-solid fa-key me-1"></i>
+        Nhập lại mật khẩu
+      </label>
+      {% include 'components/field_errors.html' with name='password_confirm' %}
+    </div>
+
+    <div class="d-grid mb-5">
+      <button type="submit" class="btn btn-secondary" id="register_submit_btn">Đăng ký</button>
+    </div>
+
+    <hr>
+
+    <div class="text-end">
+      Bạn đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập</a>
+    </div>
+  </form>
+</div>
+{% endblock main %}
+
+{% block style %}
+<style>
+  .register-container {
+    max-width: 450px;
+  }
+
+  .logo {
+    max-width: 200px;
+  }
+</style>
+{% endblock style %}

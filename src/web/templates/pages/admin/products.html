@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load currency_vnd %}
+
+{% block title %}
+Quản lý sản phẩm
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" with path='admin' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5">
+  <div class="d-flex">
+    <h4 class="me-2">Danh sách sản phẩm</h4>
+    <form class="ms-auto">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Tìm kiếm" name="search_product" id="searchProduct">
+        <button class="btn btn-success" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+    </form>
+    <div class="ms-3">
+      <a href="{% url 'admin_products_create' %}" class="btn btn-primary">Thêm mới</a>
+    </div>
+  </div>
+
+  <div class="mt-5 table-responsive border rounded p-4 bg-body-tertiary">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Tên sản phẩm</th>
+          <th scope="col">Giá</th>
+          <th scope="col">Hãng</th>
+          <th scope="col">Loại</th>
+          <th scope="col">Thiết bị</th>
+          <th scope="col">Chi tiết</th>
+        </tr>
+      </thead>
+
+      <tbody class="load-fade">
+        {% for product in products %}
+        <tr>
+          <td class="text-break" style="max-width: 20rem;"><a target="_blank" href="{% url 'products_detail' product_id=product.id %}">{{ product.name }}</a></td>
+          <td class="text-break" style="max-width: 10rem;">{{ product.price|currency_vnd }}</td>
+          <td class="text-break" style="max-width: 20rem;">{{ product.brand.name|default_if_none:'-' }}</td>
+          <td>{{ product.type }}</td>
+          <td><a href="{% url 'admin_devices' %}?product_id={{product.id}}">Xem</a></td>
+          <td><a href="{% url 'admin_products_update' product_id=product.id %}">Sửa</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+{% endblock main %}
+
+{% block script %}
+<script>
+  const searchProduct = new URLSearchParams(window.location.search).get("search_product")
+  document.querySelector('#searchProduct').value = searchProduct
+</script>
+{% endblock script %}

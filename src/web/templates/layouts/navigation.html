@@ -1,0 +1,66 @@
+{% load phone_number_mark %}
+{% load static %}
+
+<a class="navbar-brand me-1" href="{% url 'home' %}">
+  <img src="{% static 'imgs/brand.jpg' %}" alt="Logo" width="24" height="24" class="d-inline-block align-text-top rounded-circle">
+  OD Tech
+</a>
+
+<div class="mx-auto d-flex">
+  <form class="me-3">
+    <input name="search" id="search" class="form-control text-center rounded-pill search-input py-2" placeholder="🔎 Bạn muốn tìm gì...">
+  </form>
+  <div>
+    <a href="{% url 'carts' %}" class="btn btn-outline-success py-2 px-3 {% if path == 'cart' %}active{% endif %}"><i class="fa-solid fa-cart-shopping"></i></a>
+  </div>
+</div>
+
+<div>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mb-2 mb-lg-0">
+      {% if user.role == 'Quản trị viên' %}
+      <li class="nav-item dropdown me-4">
+        <a class="nav-link dropdown-toggle {% if path == 'admin' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Quản trị
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{% url 'admin_users' %}">Quản lý người dùng</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="{% url 'admin_products' %}">Quản lý sản phẩm</a></li>
+          <li><a class="dropdown-item" href="{% url 'admin_devices' %}">Quản lý thiết bị</a></li>
+        </ul>
+      </li>
+      {% endif %}
+
+      <li class="nav-item">
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="btn btn-outline-primary py-2 {% if path == 'profile' %}active{% endif %}">
+          <i class="fa-solid fa-user me-1"></i> {{ request.user.phone_number|phone_number_mark }}
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary py-2 {% if path == 'login' %}active{% endif %}">
+          <i class="fa-regular fa-user me-1"></i> Đăng nhập
+        </a>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .search-input {
+    width: 30rem
+  }
+
+  @media screen and (max-width: 768px) {
+    .search-input {
+      width: 10rem
+    }
+  }
+</style>

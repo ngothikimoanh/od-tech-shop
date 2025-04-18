@@ -1,0 +1,106 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+Quản lý thiết bị
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" with path='admin' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5">
+  <div class="d-flex mb-3">
+    <h4 class="me-3">Danh sách thiết bị</h4>
+    <form method="post" class="ms-auto">
+      {% csrf_token %}
+      <input type="hidden" name="product" value="{{ product_id }}">
+      <button type="submit" class="btn btn-primary">Thêm mới</button>
+    </form>
+  </div>
+
+  <form class="d-flex">
+    <div class="input-group me-4">
+      <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-check me-2"></i> Trạng thái</span>
+      <select name="status" class="form-select me-2" onchange="this.form.submit()" id="status">
+        <option value="">Tất cả</option>
+        <option value="Có sẵn">Có sẵn</option>
+        <option value="Đã bán">Đã bán</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-mobile me-2"></i> Sản phẩm</span>
+      <select name="product_id" class="form-select" onchange="this.form.submit()" id="products">
+        <option value="">Tất cả thiết bị</option>
+        {% for product in products %}
+        <option value="{{ product.id }}">{{ product.id }} - {{ product.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <div class="mt-5 table-responsive border rounded p-4 bg-body-tertiary">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Mã sản phẩm</th>
+          <th scope="col">Tên sản phẩm</th>
+          <th scope="col">Mã thiết bị</th>
+          <th scope="col">Trạng thái</th>
+          <th scope="col" class="text-center">Tạo BARCODE</th>
+        </tr>
+      </thead>
+
+      <tbody class="load-fade">
+        {% for device in devices %}
+        <tr>
+          <td>{{ device.product.id }}</td>
+          <td><a target="_blank" href="{% url 'products_detail' product_id=device.product.id %}">{{ device.product.name }}</a></td>
+          <td>{{ device.id }}</td>
+          <td>{{ device.status }}</td>
+          <td class="text-center">
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="generateBarcode(id='device:{{ device.id }}')">
+              <i class="fa-solid fa-barcode"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Code</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <svg id="barcode"></svg>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  const generateBarcode = id => {
+    JsBarcode("#barcode", id)
+  }
+
+  $('#products').val('{{ product_id|default:"" }}');
+  $('#status').val('{{ status|default:"" }}');
+</script>
+{% endblock script %}

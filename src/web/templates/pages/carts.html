@@ -1,0 +1,160 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load currency_vnd %}
+
+{% block title %}
+Giỏ hàng
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" with path='cart' %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 cart-container">
+  {% if carts %}
+  <div class="p-4 border bg-body-tertiary rounded shadow-sm mb-4">
+    {% for cart in carts %}
+    <div class="border border-primary-subtle rounded p-2 align-items-center mb-3">
+      <div class="d-flex">
+        <div>
+          <img src="{% if cart.product.image %}{{ cart.product.image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}" height="80" width="80" class="rounded">
+        </div>
+        <div class="ms-2">
+          <h6>{{ cart.product.name }}</h6>
+        </div>
+        <div class="ms-auto text-danger">
+          <h5>{{ cart.product.price|currency_vnd }}</h5>
+        </div>
+      </div>
+      <form method="post" action="{% url 'carts_update' product_id=cart.product.id %}" class="d-flex">
+        {% csrf_token %}
+        <div class="input-group w-auto ms-auto">
+          <button class="btn btn-outline-secondary px-3" name="action" value="minus"><i class="fa-solid fa-minus"></i></button>
+          <span class="input-group-text px-3">{{ cart.quantity }}</span>
+          <button class="btn btn-outline-success px-3" name="action" value="plus"><i class="fa-solid fa-plus"></i></button>
+        </div>
+      </form>
+    </div>
+    {% endfor %}
+    <div class="d-flex mt-3">
+      <div>Tạm tính ({{ count }} sản phẩm):</div>
+      <div class="ms-auto">{{ total_amount|currency_vnd }}</div>
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="border rounded bg-body-tertiary shadow-sm p-4 mb-4">
+      <h5 class="mb-3">Thông tin đặt hàng</h5>
+      <div class="mb-3">
+        <label for="orderBuyerName" class="form-label">Tên người nhận</label>
+        <input type="text" class="form-control" id="orderBuyerName" name="buyer_name" value="{% if user.is_authenticated %}{{ form.buyer_name.value|default:user.name|default:'' }}{% else %}{{ form.buyer_name.value|default:'' }}{% endif %}">
+        {% include 'components/field_errors.html' with name='buyer_name' %}
+      </div>
+
+      <div class="mb-3">
+        <label for="orderBuyerPhoneNumber" class="form-label">Số điện thoại người nhận</label>
+        <input type="text" class="form-control" id="orderBuyerPhoneNumber" name="buyer_phone_number" value="{% if user.is_authenticated %}{{ form.buyer_phone_number.value|default:user.phone_number|default:'' }}{% else %}{{ form.buyer_phone_number.value|default:'' }}{% endif %}">
+        {% include 'components/field_errors.html' with name='buyer_phone_number' %}
+      </div>
+
+      <div class="mb-3">
+        <label for="orderBuyerAddress" class="form-label">Địa chỉ nhận hàng</label>
+        <input type="text" class="form-control" id="orderBuyerAddress" name="address" value="{% if user.is_authenticated %}{{ form.address.value|default:user.address|default:'' }}{% else %}{{ form.address.value|default:'' }}{% endif %}">
+        {% include 'components/field_errors.html' with name='address' %}
+      </div>
+    </div>
+
+    <div class="border rounded bg-body-tertiary shadow-sm p-4 mb-4">
+      {% if user.is_authenticated and user.points %}
+      <div class="mb-3 d-flex">
+        <div class="form-check form-switch">
+          <input class="form-check-input" name="isUsePoint" type="checkbox" role="switch" id="isUsePoint" onchange="updateUsePoint()">
+          <label class="form-check-label" for="isUsePoint">Sử dụng tích điểm</label>
+        </div>
+        <div class="ms-auto">
+          -{{ user.points|currency_vnd }}
+        </div>
+      </div>
+      <hr>
+      {% endif %}
+      <div class="d-flex">
+        <div>
+          <div>Tổng số tiền</div>
+          <small>Điểm tích lũy</small>
+        </div>
+        <div class="ms-auto">
+          <div class="text-end"><strong id="orderTotalAmount"></strong></div>
+          <div class="text-end"><small id="orderPoint"></small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border rounded bg-body-tertiary shadow-sm p-4 mb-4">
+      <h6>Hình thức thanh toán</h6>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment_method" id="cashOnDelivered">
+        <label class="form-check-label" for="cashOnDelivered">
+          <i class="fa-solid fa-money-bill"></i> Thanh toán tiền mặt khi nhận hàng
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment_method" id="transferNow" checked>
+        <label class="form-check-label" for="transferNow">
+          <i class="fa-solid fa-money-bill-transfer"></i> Chuyển khoản ngân hàng
+        </label>
+      </div>
+    </div>
+
+    <div class="d-grid">
+      <button class="btn btn-primary">Đặt hàng</button>
+    </div>
+  </form>
+
+  {% else %}
+  <div class="p-4 border bg-body-tertiary rounded shadow-sm">
+    <div class="text-center py-4 px-3">
+      <img src="{% static 'imgs/empty-cart.9584ed8be12c768f9e508dd8a.png' %}" class="w-75">
+      <h5 class="mt-4">Giỏ hàng trống</h5>
+      <small>Không có sản phẩm nào trong giỏ hàng</small>
+      <div class="mt-4 d-grid">
+        <a href="{% url 'home' %}" class="btn btn-primary">Về lại trang chủ</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock main %}
+
+{% block style %}
+<style>
+  .cart-container {
+    max-width: 40rem
+  }
+</style>
+{% endblock style %}
+
+{% block script %}
+<script>
+  const orderTotalProductPrice = Number('{{ total_amount }}')
+  const currentUserPoint = Number('{{ user.points|default:0 }}')
+
+  const orderTotalAmountEl = document.getElementById('orderTotalAmount')
+  const orderPointEl = document.getElementById('orderPoint')
+  const isUsePointInputEl = document.getElementById('isUsePoint')
+
+  const updateUsePoint = () => {
+    if (isUsePointInputEl) {
+      let totalAmount = (isUsePointInputEl.checked) ? orderTotalProductPrice - currentUserPoint : orderTotalProductPrice
+      orderTotalAmountEl.textContent = currencyVND(totalAmount)
+      orderPointEl.textContent = `+${totalAmount / 1000} điểm`
+    } else {
+      orderTotalAmountEl.textContent = currencyVND(orderTotalProductPrice)
+      orderPointEl.textContent = `0 điểm`
+    }
+  }
+  updateUsePoint()
+</script>
+{% endblock script %}

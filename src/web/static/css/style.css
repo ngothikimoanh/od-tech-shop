@@ -1,0 +1,15 @@
+html {
+	font-size: 14px;
+	min-width: 375px;
+}
+
+:root,
+[data-bs-theme=light] {
+	--bs-body-bg-rgb: 248, 249, 250;
+	--bs-tertiary-bg-rgb: 255, 255, 255;
+}
+
+[data-bs-theme=dark] {
+	--bs-body-bg-rgb: 33, 37, 41;
+	--bs-tertiary-bg-rgb: 43, 48, 53;
+}

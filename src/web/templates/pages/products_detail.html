@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load get_item %}
+{% load currency_vnd %}
+
+{% block title %}
+{{ product.name }}
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 product-create-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+      <li class="breadcrumb-item"><a id="filterProductType">{{ product.type }}</a></li>
+      <li class="breadcrumb-item"><a id="filterProductBrand">{{ product.brand }}</a></li>
+    </ol>
+  </nav>
+  <script>
+    document.getElementById('filterProductType').href = encodeURI(`{% url 'home' %}?filter={"productTypes":["{{ product.type }}"]}`)
+    document.getElementById('filterProductBrand').href = encodeURI(`{% url 'home' %}?filter={"brands":["{{ product.brand }}"]}`)
+  </script>
+
+  <div class="mb-4">
+    <h4>Điện thoại {{ product.name }}</h4>
+  </div>
+
+  <div class="row">
+    <div class="col-8">
+      <div class="mb-4 bg-body-tertiary border rounded shadow-sm text-center py-4">
+        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}" height="300" width="300" class="rounded">
+      </div>
+    </div>
+
+    <div class="col mb-4">
+      <div class="bg-body-tertiary rounded border shadow-sm p-4">
+        <h4 class="text-danger">{{ product.price|currency_vnd }}</h4>
+        <div>+{{ product.get_point }} điểm tích lũy</div>
+        <div class="mt-4">
+          <div class="mb-2 d-flex">
+            <form method="post" action="{% url 'carts_update' product_id=product.id %}">
+              {% csrf_token %}
+              <button class="btn btn-outline-success me-2"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ</button>
+            </form>
+            <button class="btn btn-danger">Mua ngay</button>
+          </div>
+          <div>
+            Gọi đặt mua <a href="tel:0784253460">0784253460</a> (8:00 - 21:30)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-8">
+      <div class="bg-body-tertiary rounded border shadow-sm py-4 px-3">
+        {% for attr_group in attrs %}
+        <div class="mb-3">
+          <ul class="list-group">
+            <li class="list-group-item active" aria-current="true"><strong>{{ attr_group.name }}</strong></li>
+            {% for attr in attr_group.chilren %}
+            <li class="list-group-item d-flex">
+              <div class="w-25"><strong>{{ attr.name }}</strong></div>
+              <div>{{ attributes|get_item:attr.name|default_if_none:'' }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock main %}
+
+{% block style %}
+<style>
+  .product-img {
+    width: 7rem;
+    height: 7rem;
+  }
+
+  @media only screen and (max-width: 992px) {
+
+    .col-8,
+    .col-4 {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock style %}
