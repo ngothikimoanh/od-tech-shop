@@ -22,13 +22,17 @@ Home
 	<div class="d-flex flex-wrap">
 		{% if products %}
 		{% for product in products %}
-		<div class="card m-4" style="width: 14rem;" onclick="window.location.href = `{% url 'products_detail' product_id=product.id %}`">
+		<div class="card m-4 py-3" style="width: 14rem;" onclick="window.location.href = `{% url 'products_detail' product_id=product.id %}`">
 			<img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'imgs/default_product.png' %}{% endif %}" class="card-img-top" style="width: 14rem; height: 14rem;">
 			<div class="card-body">
-				<h6 class="card-title text-truncate">{{ product.name }}</h6>
+				<h6 id="product_name" class="card-title text-truncate">{{ product.name }}</h6>
 				<h5 class="card-text text-danger">{{ product.price|currency_vnd }}</h5>
 				<div class="text-center mt-4">
-					<a onclick="event.stopPropagation()" href="#" class="btn btn-outline-primary">Mua ngay</a>
+					<form action="{% url 'carts_update' product_id=product.id %}" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="next_url" value="{% url 'carts' %}">
+						<button type="submit" class="btn btn-outline-primary">Mua ngay</button>
+					</form>
 				</div>
 			</div>
 		</div>

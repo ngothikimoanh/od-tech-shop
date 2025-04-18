@@ -5,7 +5,8 @@ from web.views.cart import carts_update_view, carts_view
 from web.views.device import admin_devices_view
 from web.views.home import home_view
 from web.views.product import (admin_products_create_view, admin_products_update_view, admin_products_view,
-                                   products_detail_view)
+                               products_detail_view)
+from web.views.qr import qr_view
 from web.views.user import admin_users_view, login_view, profile_view, register_view
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
 
     path('carts', carts_view, name='carts'),
     path('carts/update/<int:product_id>', carts_update_view, name='carts_update'),
+    path('qr-code/<int:amount>/<str:message>', qr_view, name='qr'),
 
     # Admin URL
     path('admin/users', admin_users_view, name='admin_users'),

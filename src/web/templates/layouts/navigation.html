@@ -11,7 +11,7 @@
     <input name="search" id="search" class="form-control text-center rounded-pill search-input py-2" placeholder="🔎 Bạn muốn tìm gì...">
   </form>
   <div>
-    <a href="{% url 'carts' %}" class="btn btn-outline-success py-2 px-3 {% if path == 'cart' %}active{% endif %}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a id="cart"  href="{% url 'carts' %}" class="btn btn-outline-success py-2 px-3 {% if path == 'cart' %}active{% endif %}"><i class="fa-solid fa-cart-shopping"></i></a>
   </div>
 </div>
 

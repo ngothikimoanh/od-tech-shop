@@ -45,9 +45,13 @@
           <div class="mb-2 d-flex">
             <form method="post" action="{% url 'carts_update' product_id=product.id %}">
               {% csrf_token %}
-              <button class="btn btn-outline-success me-2"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ</button>
+              <button type="submit" class="btn btn-outline-success me-2"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ</button>
             </form>
-            <button class="btn btn-danger">Mua ngay</button>
+            <form method="post" action="{% url 'carts_update' product_id=product.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="next_url" value="{% url 'carts' %}">
+              <button type="submit" class="btn btn-danger">Mua ngay</button>
+            </form>
           </div>
           <div>
             Gọi đặt mua <a href="tel:0784253460">0784253460</a> (8:00 - 21:30)

@@ -30,9 +30,15 @@ def carts_view(request: HttpRequest):
     if request.method == HTTPMethod.POST:
         is_use_point = bool(request.POST.get('isUsePoint'))
         if form.is_valid():
-            form.save(total_amount=total_amount, is_use_point=is_use_point, buyer=request.user, carts=carts)
+            order = form.save(total_amount=total_amount, is_use_point=is_use_point, buyer=request.user, carts=carts)
             messages.success(request, 'Đặt hàng thành công')
-            return redirect('home')
+
+            payment_method = request.POST.get('payment_method', 'cash')
+            if payment_method == 'cash':
+                messages.success(request, 'Đặt hàng thành công')
+                return redirect('home')
+            else:
+                return redirect('qr', amount=order.total_amount-order.point_used, message=f'THANH TOAN DON {order.id}')
         messages.error(request, 'Đặt hàng thất bại')
     context.update({'form': form})
 
@@ -62,5 +68,6 @@ def carts_update_view(request: HttpRequest, product_id: int):
         else:
             cart.save()
 
+    next_url = request.POST.get('next_url')
     previous_url = request.META.get('HTTP_REFERER', '/')
-    return redirect(previous_url)
+    return redirect(next_url or previous_url)

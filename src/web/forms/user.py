@@ -42,6 +42,14 @@ class RegisterForm(forms.Form):
     password = forms.CharField(max_length=128, validators=[validate_password])
     password_confirm = forms.CharField(max_length=128, validators=[validate_password])
 
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get("phone_number")
+
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise forms.ValidationError("Số điện thoại này đã được đăng ký.")
+
+        return phone_number
+
     def clean_password_confirm(self):
         password: str = self.cleaned_data.get("password", "")
         password_confirm: str = self.cleaned_data.get("password_confirm", "")

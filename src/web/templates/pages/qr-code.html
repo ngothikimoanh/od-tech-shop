@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+Quét mã thanh toán
+{% endblock title %}
+
+{% block navigation %}
+{% include "layouts/navigation.html" %}
+{% endblock navigation %}
+
+{% block main %}
+<div class="container my-5 border rounded shadow-sm p-4 bg-body-tertiary order-container">
+  <img class="w-100" id="qrImg">
+</div>
+<script>
+  const imgSrc = "https://img.vietqr.io/image/VCB-1054093359-print.png?accountName=NGO THI KIM OANH&amount={{amount}}&addInfo={{message}}"
+  document.getElementById('qrImg').src = encodeURI(imgSrc)
+</script>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
+
+{% block style %}
+<style>
+  .order-container {
+    max-width: 500px;
+  }
+</style>
+{% endblock style %}

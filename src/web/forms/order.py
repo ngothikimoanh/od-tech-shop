@@ -6,7 +6,7 @@ from web.models.user import User
 
 
 class OrderForm(forms.ModelForm):
-    def save(self, total_amount: int, is_use_point: bool, buyer: User, carts: list[Cart]):
+    def save(self, total_amount: int, is_use_point: bool, buyer: User, carts: list[Cart]) -> Order:
         data = self.cleaned_data
 
         if is_use_point:
@@ -33,6 +33,8 @@ class OrderForm(forms.ModelForm):
                 total_amount=cart.product.price*cart.quantity,
             )
             cart.delete()
+
+        return order
 
     class Meta:
         model = Order
